@@ -1,0 +1,10 @@
+{
+    "azureFunctions.deploySubpath": "FunctionApp",
+    "azureFunctions.scmDoBuildDuringDeployment": true,
+    "azureFunctions.pythonVenv": "FunctionApp/.venv",
+    "python.defaultInterpreterPath": "${workspaceFolder}/FunctionApp/.venv/bin/python",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectLanguageModel": 2
+}
