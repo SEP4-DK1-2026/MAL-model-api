@@ -1,44 +1,20 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
 from typing import List
 
 from api.schemas import ModelInput, PredictionResponse, WeatherData
-
-
-@dataclass
-class _ModelRegistry:
-    loaded: bool = False
-
-
-_registry = _ModelRegistry()
+from api.services.model_runtime import runtime
 
 
 def load_models_if_needed() -> None:
-    if not _registry.loaded:
-        _registry.loaded = True
+    runtime.load_if_needed()
 
 
 def generate_mock_prediction(
     prediction_offset: int, model_input: ModelInput
 ) -> PredictionResponse:
-    base_time = model_input.time or int(time.time())
-    predicted_time = base_time + (prediction_offset * 3600)
-
-    return PredictionResponse(
-        prediction_offset=prediction_offset,
-        predicted_time=predicted_time,
-        temperature=model_input.temperature + (prediction_offset * 0.15),
-        humidity=max(0.0, model_input.humidity - (prediction_offset * 0.2)),
-        wind_direction=float(
-            (model_input.wind_direction + prediction_offset * 7) % 360
-        ),
-        wind_speed=max(0.0, model_input.wind_speed + ((prediction_offset % 5) * 0.3)),
-        light=max(0, model_input.light - (prediction_offset * 20)),
-        precipitation=model_input.precipitation
-        + (0.4 if prediction_offset % 6 == 0 else 0.0),
-    )
+    return runtime.predict(prediction_offset, model_input)
 
 
 def get_mock_latest() -> WeatherData:
