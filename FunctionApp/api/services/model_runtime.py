@@ -3,7 +3,10 @@ from __future__ import annotations
 import os
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
+
+import joblib
 
 from api.schemas import ModelInput, PredictionResponse
 
@@ -11,6 +14,7 @@ from api.schemas import ModelInput, PredictionResponse
 @dataclass
 class ModelRuntime:
     loaded: bool = False
+    model: Optional[object] = None
     model_path: Optional[str] = None
     model_blob_url: Optional[str] = None
 
@@ -18,8 +22,21 @@ class ModelRuntime:
         if self.loaded:
             return
 
-        self.model_path = os.getenv("MODEL_PATH")
+        default_model_path = Path(__file__).resolve().parents[2] / "model.pkl"
+        configured_model_path = os.getenv("MODEL_PATH")
+
+        model_path = (
+            Path(configured_model_path) if configured_model_path else default_model_path
+        )
+        self.model_path = str(model_path)
         self.model_blob_url = os.getenv("MODEL_BLOB_URL")
+
+        if not model_path.exists():
+            raise FileNotFoundError(
+                f"Model file not found at {model_path}. Set MODEL_PATH or place model.pkl in the FunctionApp folder."
+            )
+
+        self.model = joblib.load(model_path)
         self.loaded = True
 
     def predict(

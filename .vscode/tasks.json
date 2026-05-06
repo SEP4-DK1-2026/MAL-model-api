@@ -15,15 +15,14 @@
     {
       "label": "pip install (functions)",
       "type": "shell",
-      "osx": {
-        "command": "${workspaceFolder}/FunctionApp/.venv/bin/python -m pip install -r requirements.txt"
-      },
-      "windows": {
-        "command": "${workspaceFolder}\\FunctionApp\\.venv\\Scripts\\python -m pip install -r requirements.txt"
-      },
-      "linux": {
-        "command": "${workspaceFolder}/FunctionApp/.venv/bin/python -m pip install -r requirements.txt"
-      },
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "requirements.txt"
+      ],
       "problemMatcher": [],
       "options": {
         "cwd": "${workspaceFolder}/FunctionApp"
