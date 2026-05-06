@@ -13,12 +13,32 @@ import joblib
 from api.schemas import ModelInput, PredictionResponse
 
 
+ALLOWED_OUTPUT_FIELDS = {
+    "temperature",
+    "humidity",
+    "wind_direction",
+    "wind_speed",
+    "precipitation",
+    "light",
+    "predicted_time",
+}
+
+DEFAULT_MODEL_OUTPUT_FIELDS = [
+    "temperature",
+    "humidity",
+    "wind_direction",
+    "wind_speed",
+    "precipitation",
+]
+
+
 @dataclass
 class ModelRuntime:
     loaded: bool = False
     model: Optional[object] = None
     model_path: Optional[str] = None
     model_blob_url: Optional[str] = None
+    model_output_fields: Optional[list[str]] = None
 
     def load_if_needed(self) -> None:
         if self.loaded:
@@ -32,6 +52,21 @@ class ModelRuntime:
         )
         self.model_path = str(model_path)
         self.model_blob_url = os.getenv("MODEL_BLOB_URL")
+        configured_output_fields = os.getenv("MODEL_OUTPUT_FIELDS")
+
+        if configured_output_fields:
+            output_fields = [field.strip() for field in configured_output_fields.split(",") if field.strip()]
+            invalid_fields = [field for field in output_fields if field not in ALLOWED_OUTPUT_FIELDS]
+            if invalid_fields:
+                raise ValueError(
+                    "Invalid MODEL_OUTPUT_FIELDS values: "
+                    + ", ".join(invalid_fields)
+                    + ". Allowed values are: "
+                    + ", ".join(sorted(ALLOWED_OUTPUT_FIELDS))
+                )
+            self.model_output_fields = output_fields
+        else:
+            self.model_output_fields = DEFAULT_MODEL_OUTPUT_FIELDS.copy()
 
         if not model_path.exists():
             raise FileNotFoundError(
@@ -168,18 +203,12 @@ class ModelRuntime:
                 if target_key is not None:
                     defaults[target_key] = value
         elif isinstance(normalized, (list, tuple)):
-            ordered_keys = [
-                "temperature",
-                "humidity",
-                "wind_direction",
-                "wind_speed",
-                "precipitation",
-                "light",
-                "predicted_time",
-            ]
+            ordered_keys = self.model_output_fields or DEFAULT_MODEL_OUTPUT_FIELDS
+            if len(normalized) != len(ordered_keys):
+                raise ValueError(
+                    f"Model returned {len(normalized)} outputs, but MODEL_OUTPUT_FIELDS expects {len(ordered_keys)} fields ({ordered_keys})."
+                )
             for idx, value in enumerate(normalized):
-                if idx >= len(ordered_keys):
-                    break
                 defaults[ordered_keys[idx]] = value
         elif isinstance(normalized, (int, float)):
             defaults["temperature"] = normalized
