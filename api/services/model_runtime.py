@@ -1,54 +1,54 @@
 from __future__ import annotations
 
-import time
+import cloudpickle
+import pandas as pd
+from sklearn.pipeline import Pipeline
 from dataclasses import dataclass
-from typing import Optional
+from pathlib import Path
 
 from api.schemas import ModelInput, PredictionResponse
-
-from api.config import MODEL_PATH, MODEL_BLOB_URL
 
 
 @dataclass
 class ModelRuntime:
-    loaded: bool = False
-    model_path: Optional[str] = None
-    model_blob_url: Optional[str] = None
+    model: Pipeline | None = None
 
     def load_if_needed(self) -> None:
-        if self.loaded:
+        if self.model:
             return
 
-        self.model_path = MODEL_PATH
-        self.model_blob_url = MODEL_BLOB_URL
-        self.loaded = True
+        with open(Path(__file__).resolve().parent.joinpath("./model.pkl"), "rb") as f:
+            self.model = cloudpickle.load(f)
 
     def predict(
         self, prediction_offset: int, model_input: ModelInput
     ) -> PredictionResponse:
         self.load_if_needed()
-        return self._predict_dummy(prediction_offset, model_input)
 
-    def _predict_dummy(
-        self, prediction_offset: int, model_input: ModelInput
-    ) -> PredictionResponse:
-        base_time = model_input.time or int(time.time())
-        predicted_time = base_time + (prediction_offset * 3600)
+        prediction = self.model.predict(
+            pd.DataFrame(
+                {
+                    "time": [model_input.time],
+                    "prediction_offset": [prediction_offset],
+                    "temperature": [model_input.temperature],
+                    "humidity": [model_input.humidity],
+                    "wind_direction": [model_input.wind_direction],
+                    "wind_speed": [model_input.wind_speed],
+                    "precipitation": [model_input.precipitation],
+                    "light": [model_input.light],
+                }
+            )
+        )[0]
 
         return PredictionResponse(
             prediction_offset=prediction_offset,
-            predicted_time=predicted_time,
-            temperature=model_input.temperature + (prediction_offset * 0.15),
-            humidity=max(0.0, model_input.humidity - (prediction_offset * 0.2)),
-            wind_direction=float(
-                (model_input.wind_direction + prediction_offset * 7) % 360
-            ),
-            wind_speed=max(
-                0.0, model_input.wind_speed + ((prediction_offset % 5) * 0.3)
-            ),
-            light=max(0, model_input.light - (prediction_offset * 20)),
-            precipitation=model_input.precipitation
-            + (0.4 if prediction_offset % 6 == 0 else 0.0),
+            predicted_time=model_input.time + prediction_offset * 60 * 60,
+            temperature=prediction[0],
+            humidity=prediction[1],
+            wind_direction=prediction[2],
+            wind_speed=prediction[3],
+            precipitation=prediction[4],
+            light=prediction[5],
         )
 
 

@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from api.schemas import PredictionRequest
 from api.services.prediction_service import (
-    generate_mock_prediction,
+    make_predition,
     load_models_if_needed,
 )
 
@@ -49,7 +49,7 @@ def get_prediction(req: func.HttpRequest) -> func.HttpResponse:
         return _json_response({"detail": exc.errors()}, status_code=422)
 
     load_models_if_needed()
-    prediction = generate_mock_prediction(
+    prediction = make_predition(
         request_model.predictionOffset,
         request_model.modelInput,
     )
