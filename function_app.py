@@ -50,7 +50,7 @@ def get_prediction(req: func.HttpRequest) -> func.HttpResponse:
 
     load_models_if_needed()
     prediction = make_predition(
-        request_model.predictionOffset,
-        request_model.modelInput,
+        request_model.prediction_offsets,
+        request_model.model_input,
     )
     return _json_response(_model_to_dict(prediction))

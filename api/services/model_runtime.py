@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 from dataclasses import dataclass
 from pathlib import Path
 
-from api.schemas import ModelInput, PredictionResponse
+from api.schemas import ModelInput, PredictionResponse, Prediction
 
 
 @dataclass
@@ -21,34 +21,40 @@ class ModelRuntime:
             self.model = cloudpickle.load(f)
 
     def predict(
-        self, prediction_offset: int, model_input: ModelInput
+        self, prediction_offsets: list[int], model_input: ModelInput
     ) -> PredictionResponse:
         self.load_if_needed()
 
-        prediction = self.model.predict(
+        n = range(len(prediction_offsets))
+        predictions = self.model.predict(
             pd.DataFrame(
                 {
-                    "time": [model_input.time],
-                    "prediction_offset": [prediction_offset],
-                    "temperature": [model_input.temperature],
-                    "humidity": [model_input.humidity],
-                    "wind_direction": [model_input.wind_direction],
-                    "wind_speed": [model_input.wind_speed],
-                    "precipitation": [model_input.precipitation],
-                    "light": [model_input.light],
+                    "time": [model_input.time for _ in n],
+                    "prediction_offset": prediction_offsets,
+                    "temperature": [model_input.temperature for _ in n],
+                    "humidity": [model_input.humidity for _ in n],
+                    "wind_direction": [model_input.wind_direction for _ in n],
+                    "wind_speed": [model_input.wind_speed for _ in n],
+                    "precipitation": [model_input.precipitation for _ in n],
+                    "light": [model_input.light for _ in n],
                 }
             )
-        )[0]
+        )
 
         return PredictionResponse(
-            prediction_offset=prediction_offset,
-            predicted_time=model_input.time + prediction_offset * 60 * 60,
-            temperature=prediction[0],
-            humidity=prediction[1],
-            wind_direction=prediction[2],
-            wind_speed=prediction[3],
-            precipitation=prediction[4],
-            light=prediction[5],
+            predictions=[
+                Prediction(
+                    prediction_offset=prediction_offsets[i],
+                    predicted_time=model_input.time + prediction_offsets[i] * 60 * 60,
+                    temperature=prediction[0],
+                    humidity=prediction[1],
+                    wind_direction=prediction[2],
+                    wind_speed=prediction[3],
+                    precipitation=prediction[4],
+                    light=prediction[5],
+                )
+                for i, prediction in enumerate(predictions)
+            ]
         )
 
 
