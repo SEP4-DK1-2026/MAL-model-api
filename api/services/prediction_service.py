@@ -8,7 +8,7 @@ def load_models_if_needed() -> None:
     runtime.load_if_needed()
 
 
-def generate_mock_prediction(
+def make_predition(
     prediction_offset: int, model_input: ModelInput
 ) -> PredictionResponse:
     return runtime.predict(prediction_offset, model_input)

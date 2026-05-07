@@ -23,5 +23,5 @@ class PredictionResponse(BaseModel):
     humidity: float
     wind_direction: float
     wind_speed: float
-    light: int
     precipitation: float
+    light: int
