@@ -1,33 +1,18 @@
 {
-    "name": "MAL-SEP4",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": ".."
-    },
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "terminal.integrated.defaultProfile.linux": "bash",
-                "terminal.integrated.profiles.linux": {
-                    "bash": {
-                        "path": "/bin/bash"
-                    }
-                }
-            },
-            "extensions": [
-                "ms-python.python",
-                "ms-toolsai.jupyter",
-                "ms-toolsai.vscode-jupyter-cell-tags",
-                "ms-toolsai.jupyter-keymap",
-                "ms-toolsai.jupyter-renderers",
-                "ms-toolsai.vscode-jupyter-slideshow",
-                "ms-python.debugpy",
-                "ms-python.vscode-python-envs",
-                "charliermarsh.ruff",
-                "ms-azuretools.vscode-azurefunctions",
-                "ms-azuretools.vscode-azurecontainerapps",
-                "ms-azuretools.vscode-docker"
-            ]
-        }
+  "name": "MAL-SEP4",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-azuretools.vscode-azurecontainerapps",
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-azuretools.vscode-docker"
+      ]
     }
+  }
 }

@@ -6,28 +6,7 @@
       "label": "func: host start",
       "command": "host start",
       "problemMatcher": "$func-python-watch",
-      "isBackground": true,
-      "dependsOn": "pip install (functions)",
-      "options": {
-        "cwd": "${workspaceFolder}/FunctionApp"
-      }
-    },
-    {
-      "label": "pip install (functions)",
-      "type": "shell",
-      "osx": {
-        "command": "${workspaceFolder}/FunctionApp/.venv/bin/python -m pip install -r requirements.txt"
-      },
-      "windows": {
-        "command": "${workspaceFolder}\\FunctionApp\\.venv\\Scripts\\python -m pip install -r requirements.txt"
-      },
-      "linux": {
-        "command": "${workspaceFolder}/FunctionApp/.venv/bin/python -m pip install -r requirements.txt"
-      },
-      "problemMatcher": [],
-      "options": {
-        "cwd": "${workspaceFolder}/FunctionApp"
-      }
+      "isBackground": true
     }
   ]
 }
