@@ -1,17 +1,4 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
-
-
-class WeatherData(BaseModel):
-    unixTime: int
-    temp: float
-    humidity: float
-    windSpeed: float
-    windDirection: float
-    precipitation: float
-    light: int
-    forecastOffsetHours: Optional[int] = None
 
 
 class ModelInput(BaseModel):

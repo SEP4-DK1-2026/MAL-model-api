@@ -10,8 +10,6 @@ from api.auth import require_api_key
 from api.schemas import PredictionRequest
 from api.services.prediction_service import (
     generate_mock_prediction,
-    get_mock_historical,
-    get_mock_latest,
     load_models_if_needed,
 )
 
@@ -74,41 +72,3 @@ def get_prediction(req: func.HttpRequest) -> func.HttpResponse:
         request_model.modelInput,
     )
     return _json_response(_model_to_dict(prediction))
-
-
-@app.route(route="v1/latest", methods=["GET"])
-def get_latest(req: func.HttpRequest) -> func.HttpResponse:
-    auth_error = _validate_api_key(req)
-    if auth_error:
-        return auth_error
-
-    latest = get_mock_latest()
-    return _json_response(_model_to_dict(latest))
-
-
-@app.route(route="v1/historical", methods=["GET"])
-def get_historical(req: func.HttpRequest) -> func.HttpResponse:
-    auth_error = _validate_api_key(req)
-    if auth_error:
-        return auth_error
-
-    start_unix = req.params.get("startUnix")
-    end_unix = req.params.get("endUnix")
-
-    if start_unix is None or end_unix is None:
-        return _json_response(
-            {"detail": "Both startUnix and endUnix query parameters are required."},
-            status_code=400,
-        )
-
-    try:
-        start_unix_int = int(start_unix)
-        end_unix_int = int(end_unix)
-    except ValueError:
-        return _json_response(
-            {"detail": "startUnix and endUnix must be integers."},
-            status_code=400,
-        )
-
-    historical = get_mock_historical(start_unix_int, end_unix_int)
-    return _json_response([_model_to_dict(point) for point in historical])
