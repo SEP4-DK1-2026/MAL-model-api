@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import os
 import time
 from dataclasses import dataclass
 from typing import Optional
 
 from api.schemas import ModelInput, PredictionResponse
+
+from api.config import MODEL_PATH, MODEL_BLOB_URL
 
 
 @dataclass
@@ -18,8 +19,8 @@ class ModelRuntime:
         if self.loaded:
             return
 
-        self.model_path = os.getenv("MODEL_PATH")
-        self.model_blob_url = os.getenv("MODEL_BLOB_URL")
+        self.model_path = MODEL_PATH
+        self.model_blob_url = MODEL_BLOB_URL
         self.loaded = True
 
     def predict(
