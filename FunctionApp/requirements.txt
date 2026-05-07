@@ -1,3 +1,0 @@
-# Azure Functions runtime
-azure-functions>=1.18.0,<2.0
-pydantic>=2.0,<3.0
