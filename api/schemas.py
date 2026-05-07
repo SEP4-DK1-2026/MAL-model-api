@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ModelInput(BaseModel):
@@ -12,11 +12,11 @@ class ModelInput(BaseModel):
 
 
 class PredictionRequest(BaseModel):
-    modelInput: ModelInput
-    predictionOffset: int = Field(gt=0, le=168)
+    model_input: ModelInput
+    prediction_offsets: list[int]
 
 
-class PredictionResponse(BaseModel):
+class Prediction(BaseModel):
     prediction_offset: int
     predicted_time: int
     temperature: float
@@ -25,3 +25,7 @@ class PredictionResponse(BaseModel):
     wind_speed: float
     precipitation: float
     light: int
+
+
+class PredictionResponse(BaseModel):
+    predictions: list[Prediction]

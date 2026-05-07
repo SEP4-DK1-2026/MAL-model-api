@@ -9,6 +9,6 @@ def load_models_if_needed() -> None:
 
 
 def make_predition(
-    prediction_offset: int, model_input: ModelInput
+    prediction_offset: list[int], model_input: ModelInput
 ) -> PredictionResponse:
     return runtime.predict(prediction_offset, model_input)
