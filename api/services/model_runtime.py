@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import cloudpickle
+from api.services.blob_storage_service import load_latest_model
+
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from dataclasses import dataclass
@@ -12,13 +13,13 @@ from api.schemas import ModelInput, PredictionResponse, Prediction
 @dataclass
 class ModelRuntime:
     model: Pipeline | None = None
+    model_group: str = "your-model-group"
 
     def load_if_needed(self) -> None:
         if self.model:
             return
 
-        with open(Path(__file__).resolve().parent.joinpath("./model.pkl"), "rb") as f:
-            self.model = cloudpickle.load(f)
+        self.model = load_latest_model(self.model_group)
 
     def predict(
         self, prediction_offsets: list[int], model_input: ModelInput
@@ -58,4 +59,4 @@ class ModelRuntime:
         )
 
 
-runtime = ModelRuntime()
+runtime = ModelRuntime(model_group="DMI") #TODO: we need to make this come from the api request instead of hardcoding

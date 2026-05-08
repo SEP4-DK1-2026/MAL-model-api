@@ -6,3 +6,5 @@ scikit-learn
 pandas
 numpy
 cloudpickle
+
+azure-storage-blob
