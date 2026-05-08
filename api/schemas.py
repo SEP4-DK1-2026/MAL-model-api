@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class ModelInput(BaseModel):
@@ -14,6 +15,7 @@ class ModelInput(BaseModel):
 class PredictionRequest(BaseModel):
     model_input: ModelInput
     prediction_offsets: list[int]
+    model: Optional[str] = None
 
 
 class Prediction(BaseModel):
@@ -29,3 +31,4 @@ class Prediction(BaseModel):
 
 class PredictionResponse(BaseModel):
     predictions: list[Prediction]
+    model: str

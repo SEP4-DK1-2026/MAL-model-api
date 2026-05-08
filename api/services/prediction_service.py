@@ -4,11 +4,7 @@ from api.schemas import ModelInput, PredictionResponse
 from api.services.model_runtime import runtime
 
 
-def load_models_if_needed() -> None:
-    runtime.load_if_needed()
-
-
 def make_predition(
-    prediction_offset: list[int], model_input: ModelInput
+    model_input: ModelInput, prediction_offsets: list[int], model: str | None
 ) -> PredictionResponse:
-    return runtime.predict(prediction_offset, model_input)
+    return runtime.predict(model_input, prediction_offsets, model)

@@ -7,10 +7,8 @@ import azure.functions as func
 from pydantic import ValidationError
 
 from api.schemas import PredictionRequest
-from api.services.prediction_service import (
-    make_predition,
-    load_models_if_needed,
-)
+from api.services.prediction_service import make_predition
+from api.services.model_service import ModelNotFoundError
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -48,9 +46,12 @@ def get_prediction(req: func.HttpRequest) -> func.HttpResponse:
     except ValidationError as exc:
         return _json_response({"detail": exc.errors()}, status_code=422)
 
-    load_models_if_needed()
-    prediction = make_predition(
-        request_model.prediction_offsets,
-        request_model.model_input,
-    )
-    return _json_response(_model_to_dict(prediction))
+    try:
+        prediction = make_predition(
+            request_model.model_input,
+            request_model.prediction_offsets,
+            request_model.model,
+        )
+        return _json_response(_model_to_dict(prediction))
+    except ModelNotFoundError as e:
+        return _json_response({"detail": str(e)}, status_code=400)
