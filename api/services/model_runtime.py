@@ -1,42 +1,31 @@
 from __future__ import annotations
 
-import cloudpickle
 import pandas as pd
-from sklearn.pipeline import Pipeline
 from dataclasses import dataclass
-from pathlib import Path
 
 from api.schemas import ModelInput, PredictionResponse, Prediction
+from api.services.model_service import get_model
 
 
 @dataclass
 class ModelRuntime:
-    model: Pipeline | None = None
-
-    def load_if_needed(self) -> None:
-        if self.model:
-            return
-
-        with open(Path(__file__).resolve().parent.joinpath("./model.pkl"), "rb") as f:
-            self.model = cloudpickle.load(f)
-
     def predict(
-        self, prediction_offsets: list[int], model_input: ModelInput
+        self, model_input: ModelInput, prediction_offsets: list[int], model: str | None
     ) -> PredictionResponse:
-        self.load_if_needed()
+        model, model_name = get_model(model)
 
-        n = range(len(prediction_offsets))
-        predictions = self.model.predict(
+        n = len(prediction_offsets)
+        predictions = model.predict(
             pd.DataFrame(
                 {
-                    "time": [model_input.time for _ in n],
+                    "time": [model_input.time] * n,
                     "prediction_offset": prediction_offsets,
-                    "temperature": [model_input.temperature for _ in n],
-                    "humidity": [model_input.humidity for _ in n],
-                    "wind_direction": [model_input.wind_direction for _ in n],
-                    "wind_speed": [model_input.wind_speed for _ in n],
-                    "precipitation": [model_input.precipitation for _ in n],
-                    "light": [model_input.light for _ in n],
+                    "temperature": [model_input.temperature] * n,
+                    "humidity": [model_input.humidity] * n,
+                    "wind_direction": [model_input.wind_direction] * n,
+                    "wind_speed": [model_input.wind_speed] * n,
+                    "precipitation": [model_input.precipitation] * n,
+                    "light": [model_input.light] * n,
                 }
             )
         )
@@ -54,7 +43,8 @@ class ModelRuntime:
                     light=prediction[5],
                 )
                 for i, prediction in enumerate(predictions)
-            ]
+            ],
+            model=model_name,
         )
 
 
