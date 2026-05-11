@@ -4,7 +4,7 @@ import pandas as pd
 from dataclasses import dataclass
 
 from api.schemas import ModelInput, PredictionResponse, Prediction
-from api.services.model_service import get_model
+from api.services.model_service import find_model
 
 
 @dataclass
@@ -12,7 +12,7 @@ class ModelRuntime:
     def predict(
         self, model_input: ModelInput, prediction_offsets: list[int], model: str | None
     ) -> PredictionResponse:
-        model, model_name = get_model(model)
+        model, model_name = find_model(model)
 
         n = len(prediction_offsets)
         predictions = model.predict(
