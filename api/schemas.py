@@ -9,7 +9,7 @@ class ModelInput(BaseModel):
     wind_direction: float
     wind_speed: float
     precipitation: float
-    light: int
+    light: float
 
 
 class PredictionRequest(BaseModel):
@@ -26,7 +26,7 @@ class Prediction(BaseModel):
     wind_direction: float
     wind_speed: float
     precipitation: float
-    light: int
+    light: float
 
 
 class PredictionResponse(BaseModel):
