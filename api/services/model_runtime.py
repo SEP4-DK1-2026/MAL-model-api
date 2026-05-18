@@ -19,13 +19,13 @@ class ModelRuntime:
             pd.DataFrame(
                 {
                     "time": [model_input.time] * n,
-                    "prediction_offset": prediction_offsets,
                     "temperature": [model_input.temperature] * n,
                     "humidity": [model_input.humidity] * n,
                     "wind_direction": [model_input.wind_direction] * n,
                     "wind_speed": [model_input.wind_speed] * n,
                     "precipitation": [model_input.precipitation] * n,
                     "light": [model_input.light] * n,
+                    "prediction_offset": prediction_offsets,
                 }
             )
         )
